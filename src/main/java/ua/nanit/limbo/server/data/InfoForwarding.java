@@ -22,7 +22,11 @@ import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.serialize.TypeSerializer;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 
 public class InfoForwarding {
@@ -72,6 +76,12 @@ public class InfoForwarding {
 
     public static class Serializer implements TypeSerializer<InfoForwarding> {
 
+        private final Path root;
+
+        public Serializer(Path root) {
+            this.root = root;
+        }
+
         @Override
         public InfoForwarding deserialize(java.lang.reflect.Type type, ConfigurationNode node) throws SerializationException {
             InfoForwarding forwarding = new InfoForwarding();
@@ -83,11 +93,36 @@ public class InfoForwarding {
             }
 
             if (forwarding.type == Type.MODERN) {
-                forwarding.secretKey = node.node("secret").getString("").getBytes(StandardCharsets.UTF_8);
+                String secret = node.node("secret").getString("");
+                if (secret.startsWith("@")) {
+                    Path path = root.resolve(secret.substring(1));
+                    try {
+                        forwarding.secretKey = Files.readString(path, StandardCharsets.UTF_8).trim().getBytes(StandardCharsets.UTF_8);
+                    } catch (IOException e) {
+                        throw new SerializationException(node, type, "Cannot read external secret file: " + path, e);
+                    }
+                } else {
+                    forwarding.secretKey = secret.getBytes(StandardCharsets.UTF_8);
+                }
             }
 
             if (forwarding.type == Type.BUNGEE_GUARD) {
-                forwarding.tokens = node.node("tokens").getList(String.class);
+                ConfigurationNode tokensNode = node.node("tokens");
+                if (tokensNode.isList()) {
+                    forwarding.tokens = tokensNode.getList(String.class);
+                } else {
+                    String tokensValue = tokensNode.getString("");
+                    if (tokensValue != null && tokensValue.startsWith("@")) {
+                        Path path = root.resolve(tokensValue.substring(1));
+                        try {
+                            forwarding.tokens = Files.readAllLines(path, StandardCharsets.UTF_8);
+                        } catch (IOException e) {
+                            throw new SerializationException(node, type, "Cannot read external tokens file: " + path, e);
+                        }
+                    } else if (tokensValue != null && !tokensValue.isEmpty()) {
+                        forwarding.tokens = Collections.singletonList(tokensValue);
+                    }
+                }
             }
 
             return forwarding;

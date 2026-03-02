@@ -82,12 +82,12 @@ public final class LimboConfig {
 
     public void load() throws Exception {
         ConfigurationOptions options = ConfigurationOptions.defaults().serializers(getSerializers());
-        YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
-                .source(this::getReader)
-                .defaultOptions(options)
-                .build();
 
-        ConfigurationNode conf = loader.load();
+        ConfigurationNode serverConf = loadFile("settings-server.yml", options);
+        ConfigurationNode networkConf = loadFile("settings-network.yml", options);
+        ConfigurationNode limboConf = loadFile("settings-limbo.yml", options);
+
+        ConfigurationNode conf = serverConf.mergeFrom(networkConf).mergeFrom(limboConf);
 
         address = conf.node("bind").get(SocketAddress.class);
         maxPlayers = conf.node("maxPlayers").getInt();
@@ -139,26 +139,30 @@ public final class LimboConfig {
         maxPacketRate = conf.node("traffic", "maxPacketRate").getDouble(-1.0);
     }
 
-    private BufferedReader getReader() throws IOException {
-        String name = "settings.yml";
-        Path filePath = Paths.get(root.toString(), name);
+    private ConfigurationNode loadFile(String name, ConfigurationOptions options) throws IOException {
+        Path filePath = root.resolve(name);
 
         if (!Files.exists(filePath)) {
-            InputStream stream = getClass().getResourceAsStream( "/" + name);
+            try (InputStream stream = getClass().getResourceAsStream("/" + name)) {
+                if (stream == null)
+                    throw new FileNotFoundException("Cannot find " + name + " resource file");
 
-            if (stream == null)
-                throw new FileNotFoundException("Cannot find settings resource file");
-
-            Files.copy(stream, filePath);
+                Files.copy(stream, filePath);
+            }
         }
 
-        return Files.newBufferedReader(filePath);
+        YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
+                .path(filePath)
+                .defaultOptions(options)
+                .build();
+
+        return loader.load();
     }
 
     private TypeSerializerCollection getSerializers() {
         return TypeSerializerCollection.builder()
                 .register(SocketAddress.class, new SocketAddressSerializer())
-                .register(InfoForwarding.class, new InfoForwarding.Serializer())
+                .register(InfoForwarding.class, new InfoForwarding.Serializer(root))
                 .register(PingData.class, new PingData.Serializer())
                 .register(BossBar.class, new BossBar.Serializer())
                 .register(Title.class, new Title.Serializer())

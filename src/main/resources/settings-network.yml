@@ -1,0 +1,50 @@
+#
+# NanoLimbo network configuration
+#
+
+# Player info forwarding support.
+# Available types:
+#  - NONE
+#  - LEGACY
+#  - MODERN
+#  - BUNGEE_GUARD
+# Don't use secret if you do not use MODERN type
+#
+# You can use the '@' prefix to read sensitive data from an external file.
+# The path is relative to the server root. Examples:
+#  - secret: '@secret.txt' (reads from secret.txt in the same folder)
+#  - secret: '@security/key.txt' (reads from security/key.txt subfolder)
+infoForwarding:
+  type: NONE
+  secret: '@secret.txt'
+  tokens: '@tokens.txt'
+
+# Read timeout for connections in milliseconds
+readTimeout: 30000
+
+# Warning! Do not touch params of this block if you are not completely sure what is this!
+netty:
+  # Use a Linux native transport type, if it possible
+  useEpoll: true
+  # EventLoopGroup threads count
+  threads:
+    bossGroup: 1
+    workerGroup: 4
+
+# Options to check incoming traffic and kick potentially malicious connections.
+# Take into account that player can send many small packets, for example, just moving mouse.
+traffic:
+  # If true, then additional handler will be added to the channel pipeline
+  enable: true
+  # Max packet size in bytes
+  # Unlimited if -1
+  maxPacketSize: 8192
+  # The interval to measure packets over
+  # Lowering this value will limit peak packets from players which would target people with bad connections
+  # Raising this value will allow higher peak packet rates, which will help with people who have poor connections
+  # Ignored if -1.0
+  interval: 7.0
+  # The maximum packets per second for players
+  # It is measured over the configured interval
+  # Ignored if -1.0
+  maxPacketRate: 500.0

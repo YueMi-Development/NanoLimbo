@@ -1,35 +1,31 @@
-#
-# NanoLimbo limbo configuration
-#
-
 # Server's data in servers list
 ping:
-  description: '{"text": "&9NanoLimbo"}'
-  version: 'NanoLimbo'
+  description: "<gradient:blue:white>NanoLimbo"
+  version: "<gradient:blue:white>NanoLimbo"
   # Return static protocol version number in ping result
   # By default, its -1 to return the client version if it supported
-  # https://wiki.vg/Protocol_version_numbers
+  # https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol_version_numbers
   protocol: -1
 
 # Max number of players can join to server
 # Set -1 to make it infinite
 maxPlayers: 100
 
-# Available dimensions: OVERWORLD, NETHER, THE_END
+# Available dimensions: OVERWORLD, THE_NETHER, THE_END
 dimension: THE_END
 
 # Whether to display the player in the player list
 # For 1.16.5 clients, the player list will be sent even if disabled, to avoid crash
 playerList:
-  enable: false
-  username: 'NanoLimbo'
+  enable: true
+  username: "NanoLimbo"
 
 # Whether to display header and footer in player list
 # For 1.8+ clients
 headerAndFooter:
-  enable: false
-  header: '{"text": "&eWelcome!"}'
-  footer: '{"text": "&9NanoLimbo"}'
+  enable: true
+  header: "<white>Welcome!"
+  footer: "<gradient:blue:white>NanoLimbo"
 
 # Setup player's game mode
 # 0 - Survival
@@ -39,25 +35,29 @@ headerAndFooter:
 # Spectator works on 1.8+ clients
 gameMode: 3
 
+# Remove secure-chat toast
+# For 1.20.5+ clients
+secureProfile: false
+
 # Server name which is shown under F3
 # For 1.13+ clients
 brandName:
   enable: true
-  content: 'NanoLimbo'
+  content: "<gradient:blue:white>NanoLimbo"
 
 # Message sends when player joins to the server
 joinMessage:
   enable: true
-  text: '{"text": "&eWelcome to the Limbo!"}'
+  text: "<white>Welcome to the <gradient:blue:white>NanoLimbo<white>!"
 
 # BossBar displays when player joins to the server
 # For 1.9+ clients
 bossBar:
   enable: true
-  text: '{"text": "Welcome to the Limbo!"}'
+  text: "<white>Welcome to the <gradient:blue:white>NanoLimbo<white>!"
   health: 1.0
   # Available colors: PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE
-  color: PINK
+  color: BLUE
   # Available divisions: SOLID, DASHES_6, DASHES_10, DASHES_12, DASHES_20
   division: SOLID
 
@@ -66,9 +66,9 @@ bossBar:
 title:
   enable: true
   # Set title text value empty, if you need only subtitle
-  title: '{"text": "&9&lWelcome!"}'
+  title: "<white><b>Welcome!"
   # Set subtitle text value empty, if you need only title
-  subtitle: '{"text": "&6NanoLimbo"}'
+  subtitle: "<gradient:blue:white>NanoLimbo"
   # Fade in time in ticks (1 sec = 20 ticks)
   fadeIn: 10
   # Stay time in ticks

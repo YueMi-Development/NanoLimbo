@@ -24,8 +24,12 @@ readTimeout: 30000
 
 # Warning! Do not touch params of this block if you are not completely sure what is this!
 netty:
-  # Use a Linux native transport type, if it possible
-  useEpoll: true
+  # Available transport type:
+  # - EPOLL
+  # - IO_URING
+  # - KQUEUE
+  # - NIO
+  transportType: EPOLL
   # EventLoopGroup threads count
   threads:
     bossGroup: 1
@@ -48,3 +52,7 @@ traffic:
   # It is measured over the configured interval
   # Ignored if -1.0
   maxPacketRate: 500.0
+  # The maximum packet bytes per second for players
+  # It is measured over the configured interval as an average bytes/sec
+  # Ignored if -1.0
+  maxPacketBytesRate: 2048.0
